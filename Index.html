@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C333 Photo Enhancer</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101114;color:white;font-family:Arial,sans-serif}
+header{text-align:center;padding:25px;border-bottom:1px solid #303038}
+.logo{font-size:36px;font-weight:900;letter-spacing:5px}
+p{color:#aaa}
+main{max-width:480px;margin:auto;padding:20px}
+.upload{display:block;border:2px dashed #666;border-radius:15px;padding:35px 15px;text-align:center;cursor:pointer}
+input{display:none}
+img{display:none;width:100%;max-height:430px;object-fit:contain;margin:20px 0;border-radius:12px}
+button{width:100%;padding:15px;border:0;border-radius:10px;margin-top:12px;font-size:16px;font-weight:bold;cursor:pointer}
+#enhance{background:#fff;color:#111}
+#download{display:none;background:#8b5cf6;color:#fff}
+#status{text-align:center;font-size:14px}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">C333</div>
+<p>AI Photo Enhancer</p>
+</header>
+<main>
+<label class="upload" for="photo">
+<div style="font-size:36px">＋</div>
+<strong>Upload Your Photo</strong>
+<p>Choose a photo from your phone</p>
+</label>
+<input id="photo" type="file" accept="image/*">
+<img id="preview" alt="Photo preview">
+<button id="enhance" disabled>✨ Clear Photo</button>
+<button id="download">Download Photo</button>
+<p id="status">Upload a photo to get started.</p>
+</main>
+<script>
+const input=document.getElementById('photo');
+const img=document.getElementById('preview');
+const enhance=document.getElementById('enhance');
+const download=document.getElementById('download');
+const status=document.getElementById('status');
+let source=new Image(),result=null;
+
+input.onchange=()=>{
+ const file=input.files[0];
+ if(!file)return;
+ const url=URL.createObjectURL(file);
+ source.onload=()=>{
+  img.src=url;
+  img.style.display='block';
+  enhance.disabled=false;
+  download.style.display='none';
+  result=null;
+  status.textContent='Photo ready. Tap Clear Photo.';
+ };
+ source.onerror=()=>status.textContent='Could not open this photo.';
+ source.src=url;
+};
+
+enhance.onclick=()=>{
+ if(!source.naturalWidth)return;
+ try{
+  const canvas=document.createElement('canvas');
+  canvas.width=source.naturalWidth;
+  canvas.height=source.naturalHeight;
+  const ctx=canvas.getContext('2d');
+  ctx.filter='contrast(115%) saturate(108%)';
+  ctx.drawImage(source,0,0);
+  ctx.filter='none';
+  result=canvas.toDataURL('image/jpeg',0.95);
+  img.src=result;
+  download.style.display='block';
+  status.textContent='Photo enhancement complete!';
+ }catch(e){
+  status.textContent='Could not enhance this photo.';
+ }
+};
+
+download.onclick=()=>{
+ if(!result)return;
+ const a=document.createElement('a');
+ a.href=result;
+ a.download='C333-enhanced.jpg';
+ a.click();
+};
+</script>
+</body>
+</html>
